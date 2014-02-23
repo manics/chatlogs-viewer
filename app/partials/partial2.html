@@ -1,3 +1,7 @@
+<datepicker ng-model='dateStart' disable-timepicker='true'
+  label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'
+  on-change='messages.initialise(dateStart)'></datepicker>
+
 <div class='messages'>
   <a ng-click='messages.page(-1)' class='more'>Load previous</a>
   <div ng-repeat='msg in messages.items' class='message' scroll-after>

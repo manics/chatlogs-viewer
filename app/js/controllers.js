@@ -2,7 +2,7 @@
 
 /* Controllers */
 
-var myApp = angular.module('myApp.controllers', []);
+var myApp = angular.module('myApp.controllers', ['ngQuickDate']);
 
 myApp.controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
   $http.get('sysadmin.json').success(function(data) {
@@ -12,60 +12,84 @@ myApp.controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
 
 myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
   $scope.messages = new ChatMessages();
-  $scope.messages.page(1);
+  $scope.dateStart = new Date();
+  $scope.messages.initialise($scope.dateStart);
 }]);
 
 // Constructor function to encapsulate HTTP and pagination logic
 myApp.factory('ChatMessages', function($http) {
   var ChatMessages = function() {
     this.items = [];
-    this.busy = [false, false];
-    this.startdt = '';
-    this.enddt = '';
+    this.busy = false;
+    this.startdt = null;
+    this.enddt = null;
     this.prepended = 0;
     this.appended = 0;
   };
 
-  ChatMessages.prototype.page = function(dir) {
-    var busyvar = 1;
-    if (dir < 0) busyvar = 0;
-    if (this.busy[busyvar]) return;
-    this.busy[busyvar] = true;
+  ChatMessages.prototype.initialise = function(date) {
+    this.startdt = new Date(date);
+    this.enddt = this.incrdate(date, 1);
+    this.page(0);
+  };
 
-    //var url = "http://api.reddit.com/hot?after=" + this.after + "&jsonp=JSON_CALLBACK";
-    var url = "sysadmin.json";
+  ChatMessages.prototype.incrdate = function(date, inc) {
+    var d = new Date(date);
+    d.setDate(date.getDate() + inc);
+    return d;
+  };
+
+  ChatMessages.prototype.page = function(dir) {
+    if (this.busy) return;
+    this.busy = true;
+    var fetchFrom = null;
+    var fetchTo = null;
+
+    if (dir > 0) {
+      fetchFrom = this.enddt;
+      fetchTo = this.incrdate(fetchFrom, dir);
+    }
+    else if (dir < 0) {
+      fetchTo = this.startdt;
+      fetchFrom = this.incrdate(fetchTo, dir);
+    }
+    else {
+      fetchFrom = this.startdt;
+      fetchTo = this.enddt;
+    }
+
+    var server = 'http://localhost:18888/';
+    var room = 'sysadmin';
+    //var url = "sysadmin.json";
+    var url = server + '?room=' + room +
+      '&startdt=' + fetchFrom.toISOString() +
+      '&enddt=' + fetchTo.toISOString() +
+      '&callback=JSON_CALLBACK';
     console.log(url);
-    //$http.jsonp(url).success(function(data) {
-    $http.get(url).success(function(data) {
-      if (dir >= 0) {
+    //$http.get(url).success(function(data) {
+    $http.jsonp(url).success(function(data) {
+      if (dir > 0) {
         for (var i = 0; i < data.length; i++) {
           this.items.push(data[i]);
         }
 
         this.prepended = 0;
         this.appended = data.length;
-
-        if (data.length) {
-          this.enddt = data[data.length - 1].timestamp;
-          if (!this.startdt)
-            this.startdt = data[0].timestamp;
-        }
-      } else {
+        this.enddt = fetchTo;
+      } else if (dir < 0) {
         for (var i = data.length - 1; i >= 0; i--) {
           this.items.unshift(data[i]);
         }
 
         this.prepended = data.length;
         this.appended = 0;
-
-        if (data.length) {
-          this.startdt = data[0].timestamp;
-          if (!this.enddt)
-            this.enddt = data[data.length - 1].timestamp;
-        }
+        this.startdt = fetchFrom;
+      } else {
+        this.items = data;
+        this.prepended = 0;
+        this.appended = data.length;
       }
-      //this.after = "t3_" + this.items[this.items.length - 1].id;
-      this.busy[busyvar] = false;
+      this.busy = false;
 
       console.log('startdt: ' + this.startdt);
       console.log('enddt: ' + this.enddt);
@@ -73,19 +97,5 @@ myApp.factory('ChatMessages', function($http) {
   };
 
   return ChatMessages;
-});
-
-myApp.directive('scrollAfter', function($timeout) {
-  return {
-    restrict: 'A',
-    link: function(scope, element, attrs) {
-      if (attrs.ngRepeat && scope.$index == scope.messages.prepended - 1) {
-        $timeout(function() {
-          element[0].parentElement.scrollTop = element[0].getBoundingClientRect().top - element[0].parentElement.getBoundingClientRect().top;
-        });
-      }
-      return scope;
-    }
-  };
 });
 
