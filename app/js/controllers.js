@@ -27,16 +27,24 @@ myApp.factory('ChatMessages', function($http) {
     this.appended = 0;
   };
 
-  ChatMessages.prototype.initialise = function(date) {
-    this.startdt = new Date(date);
-    this.enddt = this.incrdate(date, 1);
-    this.page(0);
+  function zeroTime(date) {
+    date.setHours(0);
+    date.setMinutes(0);
+    date.setSeconds(0);
+    date.setMilliseconds(0);
   };
 
-  ChatMessages.prototype.incrdate = function(date, inc) {
+  function incrdate(date, inc) {
     var d = new Date(date);
     d.setDate(date.getDate() + inc);
     return d;
+  };
+
+  ChatMessages.prototype.initialise = function(date) {
+    this.startdt = new Date(date);
+    zeroTime(this.startdt);
+    this.enddt = incrdate(this.startdt, 1);
+    this.page(0);
   };
 
   ChatMessages.prototype.page = function(dir) {
@@ -47,11 +55,11 @@ myApp.factory('ChatMessages', function($http) {
 
     if (dir > 0) {
       fetchFrom = this.enddt;
-      fetchTo = this.incrdate(fetchFrom, dir);
+      fetchTo = incrdate(fetchFrom, dir);
     }
     else if (dir < 0) {
       fetchTo = this.startdt;
-      fetchFrom = this.incrdate(fetchTo, dir);
+      fetchFrom = incrdate(fetchTo, dir);
     }
     else {
       fetchFrom = this.startdt;
