@@ -28,3 +28,42 @@
   content: "";
   padding: 0;
 }
+
+
+a.more {
+  background-color: #cccccc;
+  text-align: center;
+  display: block;
+}
+a.more:hover {
+  background-color: #dddddd;
+}
+.messages {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+}
+.fullmessage {
+  margin-bottom: 0.25em;
+}
+.error {
+  color: red;
+  font-weight: bold;
+}
+.timestamp {
+  color: gray;
+  width: 15em;
+  display: table-cell;
+}
+.nick {
+  color: gray;
+  font-weight: bold;
+  width: 5em;
+  display: table-cell;
+  /*text-align: right;*/
+}
+.message {
+  color: black;
+  display: table-cell;
+}
+

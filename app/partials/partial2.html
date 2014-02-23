@@ -1,4 +1,13 @@
-<p>This is the partial for view 2.</p>
+<div class='messages'>
+  <a ng-click='messages.page(-1)' class='more'>Load previous</a>
+  <div ng-repeat='msg in messages.items' class='fullmessage'>
+    <div class='timestamp'><a id='msg-{{msg.timestamp}}'>{{msg.timestamp}}</a></div>
+    <div class='nick'>{{msg.nick}}</div>
+    <div class='message'>{{msg.message}}</div>
+  </div>
+  <a ng-click='messages.page(1)' class='more'>Load next</a>
+</div>
+
 <p>
   Showing of 'interpolate' filter:
   {{ 'Current version is v%VERSION%.' | interpolate }}
