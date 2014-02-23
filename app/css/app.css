@@ -43,7 +43,7 @@ a.more:hover {
   table-layout: fixed;
   width: 100%;
 }
-.fullmessage {
+.message {
   margin-bottom: 0.25em;
 }
 .error {
@@ -62,7 +62,7 @@ a.more:hover {
   display: table-cell;
   /*text-align: right;*/
 }
-.message {
+.messagetext {
   color: black;
   display: table-cell;
 }
