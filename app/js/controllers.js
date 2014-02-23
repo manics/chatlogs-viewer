@@ -22,6 +22,8 @@ myApp.factory('ChatMessages', function($http) {
     this.busy = [false, false];
     this.startdt = '';
     this.enddt = '';
+    this.prepended = 0;
+    this.appended = 0;
   };
 
   ChatMessages.prototype.page = function(dir) {
@@ -39,6 +41,10 @@ myApp.factory('ChatMessages', function($http) {
         for (var i = 0; i < data.length; i++) {
           this.items.push(data[i]);
         }
+
+        this.prepended = 0;
+        this.appended = data.length;
+
         if (data.length) {
           this.enddt = data[data.length - 1].timestamp;
           if (!this.startdt)
@@ -48,15 +54,14 @@ myApp.factory('ChatMessages', function($http) {
         for (var i = data.length - 1; i >= 0; i--) {
           this.items.unshift(data[i]);
         }
+
+        this.prepended = data.length;
+        this.appended = 0;
+
         if (data.length) {
           this.startdt = data[0].timestamp;
           if (!this.enddt)
             this.enddt = data[data.length - 1].timestamp;
-
-          //$location.hash('msg-' + data[data.length - 1].timestamp);
-          //$anchorScroll();
-          var elid = 'msg-' + data[data.length - 1].timestamp;
-          document.getElementById(elid).scrollIntoView(true);
         }
       }
       //this.after = "t3_" + this.items[this.items.length - 1].id;
@@ -68,5 +73,19 @@ myApp.factory('ChatMessages', function($http) {
   };
 
   return ChatMessages;
+});
+
+myApp.directive('scrollAfter', function($timeout) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      if (attrs.ngRepeat && scope.$index == scope.messages.prepended - 1) {
+        $timeout(function() {
+          element[0].parentElement.scrollTop = element[0].getBoundingClientRect().top - element[0].parentElement.getBoundingClientRect().top;
+        });
+      }
+      return scope;
+    }
+  };
 });
 

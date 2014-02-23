@@ -39,9 +39,11 @@ a.more:hover {
   background-color: #dddddd;
 }
 .messages {
-  display: table;
-  table-layout: fixed;
+  /*display: table;
+  table-layout: fixed;*/
   width: 100%;
+  height: 75vh;
+  overflow: auto;
 }
 .message {
   margin-bottom: 0.25em;
@@ -54,16 +56,22 @@ a.more:hover {
   color: gray;
   width: 15em;
   display: table-cell;
+  /*float: left;
+  display: block;*/
 }
 .nick {
   color: gray;
   font-weight: bold;
   width: 5em;
   display: table-cell;
+  /*float: left;
+  display: inline-block;*/
   /*text-align: right;*/
 }
 .messagetext {
   color: black;
   display: table-cell;
+  /*display: inline-block;
+  white-space: initial;*/
 }
 
