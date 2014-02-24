@@ -62,7 +62,7 @@ a.more:hover {
 .nick {
   color: gray;
   font-weight: bold;
-  width: 5em;
+  width: 8em;
   display: table-cell;
   /*float: left;
   display: inline-block;*/
@@ -71,6 +71,7 @@ a.more:hover {
 .messagetext {
   color: black;
   display: table-cell;
+  white-space: pre-wrap;
   /*display: inline-block;
   white-space: initial;*/
 }

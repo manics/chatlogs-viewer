@@ -11,13 +11,17 @@ myApp.controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
 }]);
 
 myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
+  $scope.rooms = [
+    'sysadmin',
+  ];
+  $scope.room = $scope.rooms[0];
   $scope.messages = new ChatMessages();
   $scope.dateStart = new Date();
-  $scope.messages.initialise($scope.dateStart);
+  $scope.messages.initialise($scope.room, $scope.dateStart);
 }]);
 
 // Constructor function to encapsulate HTTP and pagination logic
-myApp.factory('ChatMessages', function($http) {
+myApp.factory('ChatMessages', function($http, $filter) {
   var ChatMessages = function() {
     this.items = [];
     this.busy = false;
@@ -25,6 +29,8 @@ myApp.factory('ChatMessages', function($http) {
     this.enddt = null;
     this.prepended = 0;
     this.appended = 0;
+    this.room = null;
+    this.status = 'Loading...';
   };
 
   function zeroTime(date) {
@@ -40,7 +46,8 @@ myApp.factory('ChatMessages', function($http) {
     return d;
   };
 
-  ChatMessages.prototype.initialise = function(date) {
+  ChatMessages.prototype.initialise = function(room, date) {
+    this.room = room;
     this.startdt = new Date(date);
     zeroTime(this.startdt);
     this.enddt = incrdate(this.startdt, 1);
@@ -67,13 +74,15 @@ myApp.factory('ChatMessages', function($http) {
     }
 
     var server = 'http://localhost:18888/';
-    var room = 'sysadmin';
     //var url = "sysadmin.json";
-    var url = server + '?room=' + room +
+    var url = server + '?room=' + this.room +
       '&startdt=' + fetchFrom.toISOString() +
       '&enddt=' + fetchTo.toISOString() +
       '&callback=JSON_CALLBACK';
     console.log(url);
+    var datefmt = 'yyyy-MM-dd HH:mm:ssZ';
+    this.status = 'Loading ' + $filter('date')(fetchFrom, datefmt) + ' - ' +
+      $filter('date')(fetchTo, datefmt)
     //$http.get(url).success(function(data) {
     $http.jsonp(url).success(function(data) {
       if (dir > 0) {
@@ -101,6 +110,8 @@ myApp.factory('ChatMessages', function($http) {
 
       console.log('startdt: ' + this.startdt);
       console.log('enddt: ' + this.enddt);
+      this.status = $filter('date')(this.startdt, datefmt) + ' - ' +
+        $filter('date')(this.enddt, datefmt);
     }.bind(this));
   };
 
