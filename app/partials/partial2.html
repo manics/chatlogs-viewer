@@ -1,10 +1,10 @@
 <div>
-  <select ng-model="room" ng-options="r for r in rooms"
+  <select ng-model='room' ng-options='r for r in rooms'
     ng-change='messages.initialise(room, dateStart)'></select>
   <datepicker ng-model='dateStart' disable-timepicker='true'
     label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'
     on-change='messages.initialise(room, dateStart)'></datepicker>
-  <span>{{messages.status}}</span>
+  <span ng-class='{"error": messages.iserror}'>{{messages.status}}</span>
 </div>
 
 <div class='messages'>

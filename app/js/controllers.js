@@ -81,10 +81,17 @@ myApp.factory('ChatMessages', function($http, $filter) {
       '&callback=JSON_CALLBACK';
     console.log(url);
     var datefmt = 'yyyy-MM-dd HH:mm:ssZ';
+    this.iserror = false;
     this.status = 'Loading ' + $filter('date')(fetchFrom, datefmt) + ' - ' +
       $filter('date')(fetchTo, datefmt)
     //$http.get(url).success(function(data) {
     $http.jsonp(url).success(function(data) {
+      if (data.error) {
+        this.iserror = true;
+        this.status = 'ERROR: ' + data.error;
+        return;
+      }
+
       if (dir > 0) {
         for (var i = 0; i < data.length; i++) {
           this.items.push(data[i]);
@@ -112,6 +119,11 @@ myApp.factory('ChatMessages', function($http, $filter) {
       console.log('enddt: ' + this.enddt);
       this.status = $filter('date')(this.startdt, datefmt) + ' - ' +
         $filter('date')(this.enddt, datefmt);
+    }.bind(this)
+    ).error(function(data, status) {
+      this.iserror = true;
+      this.status = 'ERROR: status:' + status + ' (' + data + ')';
+      return;
     }.bind(this));
   };
 
