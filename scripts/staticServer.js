@@ -6,15 +6,6 @@ var util = require('util'),
     url = require('url'),
     events = require('events');
 
-var DEFAULT_PORT = 8000;
-
-function main(argv) {
-  new HttpServer({
-    'GET': createServlet(StaticServlet),
-    'HEAD': createServlet(StaticServlet)
-  }).start(Number(argv[2]) || DEFAULT_PORT);
-}
-
 function escapeHtml(value) {
   return value.toString().
     replace('<', '&lt;').
@@ -37,12 +28,6 @@ function HttpServer(handlers) {
   this.handlers = handlers;
   this.server = http.createServer(this.handleRequest_.bind(this));
 }
-
-HttpServer.prototype.start = function(port) {
-  this.port = port;
-  this.server.listen(port);
-  util.puts('Http Server running at http://localhost:' + port + '/');
-};
 
 HttpServer.prototype.parseUrl_ = function(urlString) {
   var parsed = url.parse(urlString);
@@ -240,5 +225,22 @@ StaticServlet.prototype.writeDirectoryIndex_ = function(req, res, path, files) {
   res.end();
 };
 
-// Must be last,
-main(process.argv);
+
+var StaticServer = function() {
+  var _server = new HttpServer({
+    'GET': createServlet(StaticServlet),
+    'HEAD': createServlet(StaticServlet)
+  });
+
+  /*return {
+    handleRequest: function(req, res) {
+      _server.handleRequest_(req, res);
+    }
+  };*/
+  return {
+    handleRequest: _server.handleRequest_.bind(_server)
+  }
+}();
+
+module.exports = StaticServer;
+
