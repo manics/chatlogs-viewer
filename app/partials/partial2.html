@@ -1,5 +1,20 @@
-<p>This is the partial for view 2.</p>
-<p>
-  Showing of 'interpolate' filter:
-  {{ 'Current version is v%VERSION%.' | interpolate }}
-</p>
+<div>
+  <select ng-model='room' ng-options='r for r in rooms'
+    ng-change='messages.initialise(room, dateStart)'></select>
+  <datepicker ng-model='dateStart' disable-timepicker='true'
+    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'
+    on-change='messages.initialise(room, dateStart)'></datepicker>
+  <span ng-class='{"error": messages.iserror}'>{{messages.status}}</span>
+</div>
+
+<div class='messages'>
+  <a ng-click='messages.page(-1)' class='more'>Load previous</a>
+  <div ng-repeat='msg in messages.items' class='message' scroll-after>
+    <a id='msg-{{msg.timestamp}}' class='timestamp'>
+      {{msg.timestamp|date:'yyyy-MM-dd HH:mm:ssZ'}}</a>
+    <div class='nick'>{{msg.nick}}</div>
+    <div class='messagetext'>{{msg.message}}</div>
+  </div>
+  <a ng-click='messages.page(1)' class='more'>Load next</a>
+</div>
+
