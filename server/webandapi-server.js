@@ -4,6 +4,7 @@ var http = require('http');
 var util = require('util');
 var routing = require('./routing');
 var staticServer = require('./staticServer');
+var searchApi = require('./search');
 
 function apiExample(req, res) {
     res.writeHead(200, {'Content-Type': 'text/plain'});
@@ -11,7 +12,7 @@ function apiExample(req, res) {
 }
 
 routing.addRoute('^/app/', 'GET', staticServer.handleRequest);
-routing.addRoute('^/api/', 'GET', apiExample);
+routing.addRoute('^/api/', 'GET', searchApi.handleRequest);
 
 
 var DEFAULT_PORT = 8000;
