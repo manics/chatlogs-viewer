@@ -73,7 +73,7 @@ myApp.factory('ChatMessages', function($http, $filter) {
       fetchTo = this.enddt;
     }
 
-    var server = '/api/';
+    var server = '/api/search';
     //var url = "sysadmin.json";
     var url = server + '?room=' + this.room +
       '&startdt=' + fetchFrom.toISOString() +
