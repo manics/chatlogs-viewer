@@ -83,9 +83,17 @@ function search(res, qstr) {
 var Search = function() {
   var handleRequest = function(req, res) {
     var url = require('url');
-    qstr = url.parse(req.url, true).query;
+    var parts = url.parse(req.url, true);
+    // Split into components, remove empty elements
+    var comps = parts.pathname.split('/').filter(function(x) { return x; });
+    var qstr = parts.query;
     try {
-      search(res, qstr);
+      if (comps.length == 2 && comps[0] == 'api' && comps[1] == 'search') {
+        search(res, qstr);
+      }
+      else {
+        throw 'Invalid API call'
+      }
     }
     catch (err) {
       error(res, err);
