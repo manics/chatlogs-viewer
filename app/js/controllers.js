@@ -3,11 +3,12 @@
 /* Controllers */
 
 var myApp = angular.module('myApp.controllers', ['ngQuickDate']);
+var rooms = [
+  'sysadmin'
+  ];
 
 myApp.controller('Timeline1', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
-  $scope.rooms = [
-    'sysadmin',
-  ];
+  $scope.rooms = rooms;
   $scope.room = $scope.rooms[0];
   $scope.messages = new ChatMessages();
   $scope.dateStart = new Date();
@@ -16,9 +17,7 @@ myApp.controller('Timeline1', ['$scope', 'ChatMessages', function($scope, ChatMe
 }]);
 
 myApp.controller('Search1', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
-  $scope.rooms = [
-    'sysadmin'
-  ];
+  $scope.rooms = rooms;
   $scope.room = $scope.rooms[0];
   $scope.messages = new ChatMessages();
   $scope.dateStart = new Date();
