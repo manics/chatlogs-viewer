@@ -2,10 +2,15 @@
 
 var dbname = 'MdbChatLogBot';
 var mdbServer = '127.0.0.1:27017';
+mdbServer = '172.17.0.2:27017';
 
-function error(res, msg, callback) {
+function error(res, err, callback) {
   res.setHeader('Content-Type', 'application/json');
-  json = JSON.stringify({"error": msg});
+  console.log('ERROR: ' + err);
+  if (err.stack) {
+    console.log('Stack: ' + err.stack);
+  }
+  var json = JSON.stringify({ "error": String(err) });
   if (callback) {
     json = callback + '(' + json + ')';
   }
@@ -15,6 +20,7 @@ function error(res, msg, callback) {
 function search(res, qstr) {
   var MongoClient = require('mongodb').MongoClient;
   var format = require('util').format;
+  var async = require('async');
 
   var murl = 'mongodb://' + mdbServer + '/' + dbname;
   console.dir('Connecting: ' + murl);
@@ -52,18 +58,31 @@ function search(res, qstr) {
 
       console.dir(query);
       var coll = db.collection(collname);
-      coll.find(query, projection).sort({ timestamp: 1 }).toArray(
+      async.parallel({
+        'query': function(cb) {
+          coll.find(query, projection).sort({ timestamp: 1 }).toArray(cb);
+        },
+        'empty': function(cb) {
+          coll.findOne(cb);
+        }},
         function(err, results) {
           if (err) {
-            throw err;
+            error(res, err, callback);
+            return;
           }
-          console.dir(results);
+          if (results.query.length == 0 && results.empty == null) {
+            error(res, 'Invalid room', callback);
+            return;
+          }
+          console.dir(results.query);
+          var r = { 'chatlogs': results.query };
           res.setHeader('Content-Type', 'application/json');
+          var json;
           if (pretty) {
-            json = JSON.stringify(results, null, 3);
+            json = JSON.stringify(r, null, 3);
           }
           else {
-            json = JSON.stringify(results);
+            json = JSON.stringify(r);
           }
           if (callback) {
             json = callback + '(' + json + ')';
@@ -73,8 +92,7 @@ function search(res, qstr) {
         });
     }
     catch (err) {
-      console.log('Caught exception: ' + err);
-      error(res, String(err), callback);
+      error(res, err, callback);
     }
   });
 };
@@ -127,5 +145,8 @@ app.listen(18888, '0.0.0.0');
 
 process.on('uncaughtException', function (err) {
   console.log('Caught exception: ' + err);
+  if (err.stack) {
+    console.log('Stack: ' + err.stack);
+  }
 });
 
