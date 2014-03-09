@@ -125,11 +125,23 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
         this.autoupdate(this.updateinterval);
       }.bind(this), this.updateinterval);
     }
-  }
+  };
+
+  // Report an error message
+  ChatMessages.prototype.error = function(err) {
+    this.iserror = true;
+    this.status = 'ERROR: ' + err;
+    $log.error(this.status);
+    this.busy = false;
+    return;
+  };
 
   // Fetch the chatlogs for the previous or next day(s)
   ChatMessages.prototype.page = function(dir) {
-    if (this.busy) return;
+    if (this.busy) {
+      $log.warn('Busy');
+      return;
+    }
     this.busy = true;
     var fetchFrom = null;
     var fetchTo = null;
@@ -169,9 +181,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     //$http.get(url).success(function(data) {
     $http.jsonp(url, {params: params}).success(function(data) {
       if (data.error) {
-        this.iserror = true;
-        this.status = 'ERROR: ' + data.error;
-        $log.error(this.status);
+        this.error(data.error);
         return;
       }
 
@@ -216,9 +226,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
         $filter('date')(this.enddt, datefmt);
     }.bind(this)
     ).error(function(data, status) {
-      this.iserror = true;
-      this.status = 'ERROR: status:' + status + ' (' + data + ')';
-      $log.error(this.status);
+      this.error('status:' + status + ' (' + data + ')');
       return;
     }.bind(this));
   };
