@@ -28,6 +28,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     this.busy = false;
     this.startdt = null;
     this.enddt = null;
+    this.nextenddt = null;
     this.prepended = 0;
     this.appended = 0;
     this.room = null;
@@ -91,6 +92,10 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     if (dir > 0) {
       fetchFrom = this.enddt;
       fetchTo = incrdate(fetchFrom, dir);
+      if (fetchTo < this.nextenddt) {
+        fetchTo = this.nextenddt;
+        this.nextenddt = null;
+      }
     }
     else if (dir < 0) {
       fetchTo = this.startdt;
@@ -151,6 +156,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
       // search dates are [inclusive,exclusive]
       lastdt = incrmilliseconds(lastdt, 1);
       if (lastdt < this.enddt) {
+        this.nextenddt = this.enddt;
         this.enddt = lastdt;
       }
 
