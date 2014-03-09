@@ -15,6 +15,30 @@ myApp.controller('Timeline1', ['$scope', 'ChatMessages', function($scope, ChatMe
   $scope.autoupdate = 0;
 }]);
 
+myApp.controller('Search1', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
+  $scope.rooms = [
+    'sysadmin'
+  ];
+  $scope.room = $scope.rooms[0];
+  $scope.messages = new ChatMessages();
+  $scope.dateStart = new Date();
+  $scope.dateEnd = new Date();
+  $scope.regexp = null;
+  $scope.regexpopts = 'i';
+  $scope.submit = function() {
+    console.log('submit');
+    console.log($scope.regexp);
+    if ($scope.regexp) {
+      $scope.messages.initialise($scope.room, $scope.dateStart, $scope.dateEnd,
+        $scope.regexp, $scope.regexpopts);
+    }
+    else {
+      $scope.messages.error('No search terms provided');
+    }
+  };
+}]);
+
+
 // Constructor function to encapsulate HTTP and pagination logic
 myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
   var ChatMessages = function() {
@@ -37,6 +61,9 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     // The current timeout object and update interval
     this.autoupdater = null;
     this.updateinterval = 0;
+    // Search options
+    this.regexp = null;
+    this.regexpopts = null;
   };
 
   // Set the time in a date object to midnight
@@ -67,11 +94,19 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
   };
 
   // Initialise from a room name and a date
-  ChatMessages.prototype.initialise = function(room, date) {
+  ChatMessages.prototype.initialise = function(room, startdt, enddt, regexp,
+    regexpopts) {
     this.room = room;
-    this.startdt = new Date(date);
+    this.startdt = new Date(startdt);
     zeroTime(this.startdt);
-    this.enddt = incrdate(this.startdt, 1);
+    if (enddt) {
+      this.enddt = new Date(enddt);
+    }
+    else {
+      this.enddt = incrdate(this.startdt, 1);
+    }
+    this.regexp = regexp;
+    this.regexpopts = regexpopts;
     this.nextenddt = null;
     this.page(0);
   };
@@ -122,6 +157,8 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
       room: this.room,
       startdt: fetchFrom.toISOString(),
       enddt: fetchTo.toISOString(),
+      regexp: this.regexp,
+      regexpopts: this.regexpopts,
       callback: 'JSON_CALLBACK'
     };
     $log.log('Loading: ' + url + ' ' + $filter('json')(params));
@@ -188,10 +225,4 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
 
   return ChatMessages;
 });
-
-myApp.controller('Search1', ['$scope', '$http', function($scope, $http) {
-  $http.get('sysadmin.json').success(function(data) {
-    $scope.messages = data;
-  });
-}]);
 
