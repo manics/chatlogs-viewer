@@ -1,8 +1,23 @@
+<form ng-submit='submit()' ng-controller='Search1'>
+<div>
+  <select ng-model='room' ng-options='r for r in rooms'></select>
+  <datepicker ng-model='dateStart' disable-timepicker='true'
+    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'></datepicker>
+  <datepicker ng-model='dateEnd' disable-timepicker='true'
+    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'></datepicker>
+  <span>Regexp<input type='text' ng-model='regexp' /></span>
+  <span>Flags<input type='text' ng-model='regexpopts' size='3' /></span>
+  <span class='status' ng-class='{"error": messages.iserror}'>{{messages.status}}</span>
+  <input type='submit' value='Search' />
+</div>
+
 <div class='messages'>
-  <div ng-repeat='msg in messages' class='message'>
-    <div class='timestamp'>{{msg.timestamp}}</div>
+  <div ng-repeat='msg in messages.items' class='message'>
+    <a id='msg-{{msg.timestamp}}' class='timestamp'>
+      {{msg.timestamp|date:'yyyy-MM-dd HH:mm:ssZ'}}</a>
     <div class='nick'>{{msg.nick}}</div>
     <div class='messagetext'>{{msg.message}}</div>
   </div>
 </div>
+</form>
 
