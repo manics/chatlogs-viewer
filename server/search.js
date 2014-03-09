@@ -57,25 +57,32 @@ function search(res, qstr) {
       var projection = { timestamp: 1, nick: 1, message: 1, _id: 0 };
 
       console.dir(query);
+
+      // The timestamp of the most recent entry
+      lastq = { '$group': { '_id': '', 'lastdt': { '$max':'$timestamp' }}};
+
       var coll = db.collection(collname);
       async.parallel({
         'query': function(cb) {
           coll.find(query, projection).sort({ timestamp: 1 }).toArray(cb);
         },
-        'empty': function(cb) {
-          coll.findOne(cb);
+        'latest': function(cb) {
+          coll.aggregate(lastq, cb);
         }},
         function(err, results) {
           if (err) {
             error(res, err, callback);
             return;
           }
-          if (results.query.length == 0 && results.empty == null) {
+          console.dir(results);
+          if (results.latest.length == 0) {
             error(res, 'Invalid room', callback);
             return;
           }
-          console.dir(results.query);
-          var r = { 'chatlogs': results.query };
+          var r = {
+            'chatlogs': results.query,
+            'lastdt': results.latest[0].lastdt
+          };
           res.setHeader('Content-Type', 'application/json');
           var json;
           if (pretty) {
