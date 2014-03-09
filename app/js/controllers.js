@@ -92,26 +92,27 @@ myApp.factory('ChatMessages', function($http, $filter) {
         return;
       }
 
+      var msgs = data.chatlogs;
       if (dir > 0) {
-        for (var i = 0; i < data.length; i++) {
-          this.items.push(data[i]);
+        for (var i = 0; i < msgs.length; i++) {
+          this.items.push(msgs[i]);
         }
 
         this.prepended = 0;
-        this.appended = data.length;
+        this.appended = msgs.length;
         this.enddt = fetchTo;
       } else if (dir < 0) {
-        for (var i = data.length - 1; i >= 0; i--) {
-          this.items.unshift(data[i]);
+        for (var i = msgs.length - 1; i >= 0; i--) {
+          this.items.unshift(msgs[i]);
         }
 
-        this.prepended = data.length;
+        this.prepended = msgs.length;
         this.appended = 0;
         this.startdt = fetchFrom;
       } else {
-        this.items = data;
+        this.items = msgs;
         this.prepended = 0;
-        this.appended = data.length;
+        this.appended = msgs.length;
       }
       this.busy = false;
 
