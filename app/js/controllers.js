@@ -24,19 +24,28 @@ myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMess
 // Constructor function to encapsulate HTTP and pagination logic
 myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
   var ChatMessages = function() {
+    // List of chat messages
     this.items = [];
+    // Prevent concurrent updates
     this.busy = false;
+    // Current displayed datetime range
     this.startdt = null;
     this.enddt = null;
+    // The user-requested enddt may be later than the lastdt in the database
     this.nextenddt = null;
+    // Number of chat messages added to the start or end
     this.prepended = 0;
     this.appended = 0;
+    // Room name
     this.room = null;
+    // Status line
     this.status = 'Loading...';
+    // The current timeout object and update interval
     this.autoupdater = null;
     this.updateinterval = 0;
   };
 
+  // Set the time in a date object to midnight
   function zeroTime(date) {
     date.setHours(0);
     date.setMinutes(0);
@@ -44,22 +53,26 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     date.setMilliseconds(0);
   };
 
+  // Create a date object from an ISO8601 string
   function dateFromIso(s) {
     return new Date(Date.parse(s));
   }
 
+  // Add/subtract days to a date
   function incrdate(date, inc) {
     var d = new Date(date);
     d.setDate(date.getDate() + inc);
     return d;
   };
 
+  // Add/subtract milliseconds to a date
   function incrmilliseconds(date, inc) {
     var d = new Date(date);
     d.setMilliseconds(date.getMilliseconds() + inc);
     return d;
   };
 
+  // Initialise from a room name and a date
   ChatMessages.prototype.initialise = function(room, date) {
     this.room = room;
     this.startdt = new Date(date);
@@ -68,6 +81,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     this.page(0);
   };
 
+  // Setup a single auto-update iteration
   ChatMessages.prototype.autoupdate = function(interval) {
     $log.log('autoupdate: ' + interval);
     if (this.autoupdater) {
@@ -83,6 +97,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     }
   }
 
+  // Fetch the chatlogs for the previous or next day(s)
   ChatMessages.prototype.page = function(dir) {
     if (this.busy) return;
     this.busy = true;
