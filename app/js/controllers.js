@@ -4,13 +4,7 @@
 
 var myApp = angular.module('myApp.controllers', ['ngQuickDate']);
 
-myApp.controller('MyCtrl1', ['$scope', '$http', function($scope, $http) {
-  $http.get('sysadmin.json').success(function(data) {
-    $scope.messages = data;
-  });
-}]);
-
-myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
+myApp.controller('Timeline1', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
   $scope.rooms = [
     'sysadmin',
   ];
@@ -192,4 +186,10 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
 
   return ChatMessages;
 });
+
+myApp.controller('Search1', ['$scope', '$http', function($scope, $http) {
+  $http.get('sysadmin.json').success(function(data) {
+    $scope.messages = data;
+  });
+}]);
 
