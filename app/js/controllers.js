@@ -18,10 +18,11 @@ myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMess
   $scope.messages = new ChatMessages();
   $scope.dateStart = new Date();
   $scope.messages.initialise($scope.room, $scope.dateStart);
+  $scope.autoupdate = 0;
 }]);
 
 // Constructor function to encapsulate HTTP and pagination logic
-myApp.factory('ChatMessages', function($http, $filter) {
+myApp.factory('ChatMessages', function($filter, $http, $timeout) {
   var ChatMessages = function() {
     this.items = [];
     this.busy = false;
@@ -31,6 +32,8 @@ myApp.factory('ChatMessages', function($http, $filter) {
     this.appended = 0;
     this.room = null;
     this.status = 'Loading...';
+    this.autoupdater = null;
+    this.updateinterval = 0;
   };
 
   function zeroTime(date) {
@@ -63,6 +66,21 @@ myApp.factory('ChatMessages', function($http, $filter) {
     this.enddt = incrdate(this.startdt, 1);
     this.page(0);
   };
+
+  ChatMessages.prototype.autoupdate = function(interval) {
+    console.log('autoupdate: ' + interval);
+    if (this.autoupdater) {
+      $timeout.cancel(this.autoupdater);
+      this.autoupdater = null;
+    }
+    this.updateinterval = interval;
+    if (this.updateinterval > 0) {
+      this.autoupdater = $timeout(function() {
+        this.page(1);
+        this.autoupdate(this.updateinterval);
+      }.bind(this), this.updateinterval);
+    }
+  }
 
   ChatMessages.prototype.page = function(dir) {
     if (this.busy) return;
