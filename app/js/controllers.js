@@ -16,7 +16,7 @@ myApp.controller('Timeline1', ['$scope', 'ChatMessages', function($scope, ChatMe
   $scope.autoupdate = 0;
 }]);
 
-myApp.controller('Search1', ['$scope', 'ChatMessages', function($scope, ChatMessages) {
+myApp.controller('Search1', ['$scope', 'ChatMessages', 'dateUtils', function($scope, ChatMessages, dateUtils) {
   $scope.rooms = rooms;
   $scope.room = $scope.rooms[0];
   $scope.messages = new ChatMessages();
@@ -28,7 +28,9 @@ myApp.controller('Search1', ['$scope', 'ChatMessages', function($scope, ChatMess
     console.log('submit');
     console.log($scope.regexp);
     if ($scope.regexp) {
-      $scope.messages.initialise($scope.room, $scope.dateStart, $scope.dateEnd,
+      $scope.messages.initialise($scope.room,
+        dateUtils.getStartOfDay($scope.dateStart),
+        dateUtils.getEndOfDay($scope.dateEnd),
         $scope.regexp, $scope.regexpopts);
     }
     else {
@@ -39,7 +41,8 @@ myApp.controller('Search1', ['$scope', 'ChatMessages', function($scope, ChatMess
 
 
 // Constructor function to encapsulate HTTP and pagination logic
-myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
+myApp.factory('ChatMessages', function($filter, $http, $log, $timeout,
+  dateUtils) {
   var ChatMessages = function() {
     // List of chat messages
     this.items = [];
@@ -65,44 +68,16 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     this.regexpopts = null;
   };
 
-  // Set the time in a date object to midnight
-  function zeroTime(date) {
-    date.setHours(0);
-    date.setMinutes(0);
-    date.setSeconds(0);
-    date.setMilliseconds(0);
-  };
-
-  // Create a date object from an ISO8601 string
-  function dateFromIso(s) {
-    return new Date(Date.parse(s));
-  }
-
-  // Add/subtract days to a date
-  function incrdate(date, inc) {
-    var d = new Date(date);
-    d.setDate(date.getDate() + inc);
-    return d;
-  };
-
-  // Add/subtract milliseconds to a date
-  function incrmilliseconds(date, inc) {
-    var d = new Date(date);
-    d.setMilliseconds(date.getMilliseconds() + inc);
-    return d;
-  };
-
   // Initialise from a room name and a date
   ChatMessages.prototype.initialise = function(room, startdt, enddt, regexp,
     regexpopts) {
     this.room = room;
-    this.startdt = new Date(startdt);
-    zeroTime(this.startdt);
+    this.startdt = dateUtils.getStartOfDay(startdt);
     if (enddt) {
       this.enddt = new Date(enddt);
     }
     else {
-      this.enddt = incrdate(this.startdt, 1);
+      this.enddt = dateUtils.incrDate(this.startdt, 1);
     }
     this.regexp = regexp;
     this.regexpopts = regexpopts;
@@ -147,7 +122,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
 
     if (dir > 0) {
       fetchFrom = this.enddt;
-      fetchTo = incrdate(fetchFrom, dir);
+      fetchTo = dateUtils.incrDate(fetchFrom, dir);
       if (fetchTo < this.nextenddt) {
         fetchTo = this.nextenddt;
         this.nextenddt = null;
@@ -155,7 +130,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     }
     else if (dir < 0) {
       fetchTo = this.startdt;
-      fetchFrom = incrdate(fetchTo, dir);
+      fetchFrom = dateUtils.incrDate(fetchTo, dir);
     }
     else {
       fetchFrom = this.startdt;
@@ -207,12 +182,12 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
         this.appended = msgs.length;
       }
 
-      var lastdt = dateFromIso(data.lastdt);
+      var lastdt = dateUtils.dateFromIso(data.lastdt);
       if (lastdt < this.startdt) {
         this.startdt = lastdt;
       }
       // search dates are [inclusive,exclusive]
-      lastdt = incrmilliseconds(lastdt, 1);
+      lastdt = dateUtils.incrMilliseconds(lastdt, 1);
       if (lastdt < this.enddt) {
         this.nextenddt = this.enddt;
         this.enddt = lastdt;
