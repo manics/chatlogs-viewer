@@ -22,7 +22,7 @@ myApp.controller('MyCtrl2', ['$scope', 'ChatMessages', function($scope, ChatMess
 }]);
 
 // Constructor function to encapsulate HTTP and pagination logic
-myApp.factory('ChatMessages', function($filter, $http, $timeout) {
+myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
   var ChatMessages = function() {
     this.items = [];
     this.busy = false;
@@ -68,7 +68,7 @@ myApp.factory('ChatMessages', function($filter, $http, $timeout) {
   };
 
   ChatMessages.prototype.autoupdate = function(interval) {
-    console.log('autoupdate: ' + interval);
+    $log.log('autoupdate: ' + interval);
     if (this.autoupdater) {
       $timeout.cancel(this.autoupdater);
       this.autoupdater = null;
@@ -107,7 +107,7 @@ myApp.factory('ChatMessages', function($filter, $http, $timeout) {
       '&startdt=' + fetchFrom.toISOString() +
       '&enddt=' + fetchTo.toISOString() +
       '&callback=JSON_CALLBACK';
-    console.log(url);
+    $log.log('Loading: ' + url);
     var datefmt = 'yyyy-MM-dd HH:mm:ssZ';
     this.iserror = false;
     this.status = 'Loading ' + $filter('date')(fetchFrom, datefmt) + ' - ' +
@@ -117,6 +117,7 @@ myApp.factory('ChatMessages', function($filter, $http, $timeout) {
       if (data.error) {
         this.iserror = true;
         this.status = 'ERROR: ' + data.error;
+        $log.error(this.status);
         return;
       }
 
@@ -155,14 +156,15 @@ myApp.factory('ChatMessages', function($filter, $http, $timeout) {
 
       this.busy = false;
 
-      console.log('startdt: ' + this.startdt);
-      console.log('enddt: ' + this.enddt);
+      $log.log('startdt: ' + this.startdt);
+      $log.log('enddt: ' + this.enddt);
       this.status = $filter('date')(this.startdt, datefmt) + ' - ' +
         $filter('date')(this.enddt, datefmt);
     }.bind(this)
     ).error(function(data, status) {
       this.iserror = true;
       this.status = 'ERROR: status:' + status + ' (' + data + ')';
+      $log.error(this.status);
       return;
     }.bind(this));
   };
