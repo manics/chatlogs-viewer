@@ -40,9 +40,19 @@ myApp.factory('ChatMessages', function($http, $filter) {
     date.setMilliseconds(0);
   };
 
+  function dateFromIso(s) {
+    return new Date(Date.parse(s));
+  }
+
   function incrdate(date, inc) {
     var d = new Date(date);
     d.setDate(date.getDate() + inc);
+    return d;
+  };
+
+  function incrmilliseconds(date, inc) {
+    var d = new Date(date);
+    d.setMilliseconds(date.getMilliseconds() + inc);
     return d;
   };
 
@@ -114,6 +124,17 @@ myApp.factory('ChatMessages', function($http, $filter) {
         this.prepended = 0;
         this.appended = msgs.length;
       }
+
+      var lastdt = dateFromIso(data.lastdt);
+      if (lastdt < this.startdt) {
+        this.startdt = lastdt;
+      }
+      // search dates are [inclusive,exclusive]
+      lastdt = incrmilliseconds(lastdt, 1);
+      if (lastdt < this.enddt) {
+        this.enddt = lastdt;
+      }
+
       this.busy = false;
 
       console.log('startdt: ' + this.startdt);
