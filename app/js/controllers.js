@@ -115,19 +115,21 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
       fetchTo = this.enddt;
     }
 
-    var server = '/api/search';
+    var url = '/api/search';
     //var url = "sysadmin.json";
-    var url = server + '?room=' + this.room +
-      '&startdt=' + fetchFrom.toISOString() +
-      '&enddt=' + fetchTo.toISOString() +
-      '&callback=JSON_CALLBACK';
-    $log.log('Loading: ' + url);
+    var params = {
+      room: this.room,
+      startdt: fetchFrom.toISOString(),
+      enddt: fetchTo.toISOString(),
+      callback: 'JSON_CALLBACK'
+    };
+    $log.log('Loading: ' + url + ' ' + $filter('json')(params));
     var datefmt = 'yyyy-MM-dd HH:mm:ssZ';
     this.iserror = false;
     this.status = 'Loading ' + $filter('date')(fetchFrom, datefmt) + ' - ' +
       $filter('date')(fetchTo, datefmt)
     //$http.get(url).success(function(data) {
-    $http.jsonp(url).success(function(data) {
+    $http.jsonp(url, {params: params}).success(function(data) {
       if (data.error) {
         this.iserror = true;
         this.status = 'ERROR: ' + data.error;
