@@ -72,6 +72,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
     this.startdt = new Date(date);
     zeroTime(this.startdt);
     this.enddt = incrdate(this.startdt, 1);
+    this.nextenddt = null;
     this.page(0);
   };
 
@@ -173,8 +174,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout) {
 
       this.busy = false;
 
-      $log.log('startdt: ' + this.startdt);
-      $log.log('enddt: ' + this.enddt);
+      $log.log('startdt: ' + this.startdt + ' enddt: ' + this.enddt);
       this.status = $filter('date')(this.startdt, datefmt) + ' - ' +
         $filter('date')(this.enddt, datefmt);
     }.bind(this)
