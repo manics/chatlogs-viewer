@@ -1,7 +1,12 @@
 {
-  "name": "angularjs-seed",
-  "description": "A starter project for AngularJS",
-  "repository": "https://github.com/angular/angular-seed",
+  "name": "chatlogs-viewer",
+  "description": "Experimental web application for displaying chatlogs",
+  "author": "Simon Li <spli@dundee.ac.uk>",
+  "repository": "https://github.com/manics/chatlogs-viewer",
+  "dependencies": {
+    "async": ">=0.2",
+    "mongodb": ">=1.3"
+  },
   "devDependencies": {
     "phantomjs" : "~1.9",
     "karma" : "~0.10",

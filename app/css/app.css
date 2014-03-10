@@ -52,10 +52,15 @@ a.more:hover {
   color: red;
   font-weight: bold;
 }
+.status {
+  font-size: 70%;
+}
+
 .timestamp {
   color: gray;
   width: 15em;
   display: table-cell;
+  font-size: 70%;
   /*float: left;
   display: block;*/
 }
