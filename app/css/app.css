@@ -56,11 +56,17 @@ a.more:hover {
   font-size: 70%;
 }
 
+a.timestamp {
+  text-decoration: none;
+}
+a.timestamp:hover {
+  text-decoration: underline;
+}
 .timestamp {
   color: gray;
-  width: 15em;
+  width: 16em;
   display: table-cell;
-  font-size: 70%;
+  font-size: 60%;
   /*float: left;
   display: block;*/
 }
