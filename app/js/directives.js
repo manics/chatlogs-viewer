@@ -12,10 +12,16 @@ angular.module('myApp.directives', []).
   directive('scrollAfter', function($timeout) {
     return {
       restrict: 'A',
+      scope: {
+        prepended: '='
+      },
       link: function(scope, element, attrs) {
-        if (attrs.ngRepeat && scope.$index == scope.messages.prepended - 1) {
+        if (attrs.ngRepeat && scope.$parent.$index == scope.prepended - 1) {
           $timeout(function() {
-            element[0].parentElement.scrollTop = element[0].getBoundingClientRect().top - element[0].parentElement.getBoundingClientRect().top;
+            var ele = element[0];
+            var par = ele.parentElement;
+            par.scrollTop = ele.getBoundingClientRect().top -
+              par.getBoundingClientRect().top;
           });
         }
         return scope;
