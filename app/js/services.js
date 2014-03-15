@@ -25,9 +25,18 @@ angular.module('myApp.services', []).
       return s;
     }
 
+    // Is this a valid date object
+    function isValid(date) {
+      return !isNaN(date.getTime());
+    }
+
     // Create a date object from an ISO8601 string
     function dateFromIso(s) {
-      return new Date(Date.parse(s));
+      var d = new Date(Date.parse(s));
+      if (!isValid(d)) {
+        throw 'Invalid date: ' + s;
+      }
+      return d;
     }
 
     // Add/subtract days to a date
