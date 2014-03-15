@@ -188,15 +188,15 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout,
         this.appended = msgs.length;
       }
 
-      var lastdt = dateUtils.dateFromIso(data.lastdt);
-      if (lastdt < this.startdt) {
-        this.startdt = lastdt;
-      }
       // search dates are [inclusive,exclusive]
+      var lastdt = dateUtils.dateFromIso(data.lastdt);
       lastdt = dateUtils.incrMilliseconds(lastdt, 1);
       if (lastdt < this.enddt) {
         this.nextenddt = this.enddt;
         this.enddt = lastdt;
+      }
+      if (this.enddt < this.startdt) {
+        this.startdt = this.enddt;
       }
 
       this.busy = false;
