@@ -20,4 +20,14 @@ config(['$routeProvider', function($routeProvider) {
   $routeProvider.when('/search1', {templateUrl: 'partials/search1.html',
     controller: 'Search1', reloadOnSearch: false});
   $routeProvider.otherwise({redirectTo: '/timeline1'});
+}]).
+config(['ngQuickDateDefaultsProvider', function(ngQuickDateDefaultsProvider) {
+  ngQuickDateDefaultsProvider.set({
+    labelFormat: 'EEE d MMM yyyy',
+    //dateFormat: 'dd-MM-yyyy',
+    disableTimepicker: 'true',
+    defaultTime: '00:00:00'
+  });
 }]);
+// Custom dateFormat currently doesn't work properly
+

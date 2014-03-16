@@ -2,10 +2,8 @@
 <!--form ng-submit='submit()' ng-controller='Search1'-->
 <div class='parameters'>
   <select ng-model='room' ng-options='r for r in rooms'></select>
-  <datepicker ng-model='dateStart' disable-timepicker='true'
-    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'></datepicker>
-  <datepicker ng-model='dateEnd' disable-timepicker='true'
-    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'></datepicker>
+  <datepicker ng-model='dateStart'></datepicker>
+  <datepicker ng-model='dateEnd'></datepicker>
   <span>Regexp<input type='text' ng-model='regexp' size='15' /></span>
   <span>Flags<input type='text' ng-model='regexpopts' size='3' /></span>
   <input type='submit' value='Search' />
