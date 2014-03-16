@@ -15,7 +15,7 @@
   <div ng-repeat='msg in messages.items' class='message' scroll-after
     prepended='messages.prepended'>
     <a id='msg-{{msg.timestamp}}' class='timestamp'
-      href='#timeline1/{{messages.room}}/{{msg.timestamp}}'>
+      ng-href='#timeline1/{{messages.room}}/{{msg.timestamp}}'>
       {{msg.timestamp|date:'yyyy-MM-dd HH:mm:ssZ'}}</a>
     <div class='nick'>{{msg.nick}}</div>
     <div class='messagetext'>{{msg.message}}</div>
