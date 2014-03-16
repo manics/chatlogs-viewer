@@ -36,11 +36,6 @@ HttpServer.prototype.parseUrl_ = function(urlString) {
 };
 
 HttpServer.prototype.handleRequest_ = function(req, res) {
-  var logEntry = req.method + ' ' + req.url;
-  if (req.headers['user-agent']) {
-    logEntry += ' ' + req.headers['user-agent'];
-  }
-  util.puts(logEntry);
   req.url = this.parseUrl_(req.url);
   var handler = this.handlers[req.method];
   if (!handler) {
