@@ -1,13 +1,13 @@
-<div>
+<div class='parameters'>
   <select ng-model='room' ng-options='r for r in rooms'
     ng-change='messages.initialiseOne(room, dateStart, 50)'></select>
   <datepicker ng-model='dateStart' disable-timepicker='true'
     label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'
-    on-change='messages.initialise(room, dateStart)'></datepicker>
+    on-change='messages.initialiseOne(room, dateStart, 50)'></datepicker>
   <span>Autoupdate<input type='checkbox' ng-model='autoupdate'
     ng-change='messages.autoupdate(autoupdate)' ng-true-value="10000"
     ng-false-value="0" /></span>
-  <span class='status' ng-class='{"error": messages.iserror}'>{{messages.status}}</span>
+  <div class='status' ng-class='{"error": messages.iserror}'>{{messages.status}}</div>
 </div>
 
 <div class='messages'>

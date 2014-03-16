@@ -3,7 +3,7 @@
 .menu {
   list-style: none;
   border-bottom: 0.1em solid black;
-  margin-bottom: 2em;
+  margin-bottom: 0.5em;
   padding: 0 0 0.5em;
 }
 
@@ -29,6 +29,9 @@
   padding: 0;
 }
 
+.parameters {
+  margin: 0.5em 0em;
+}
 
 a.more {
   background-color: #cccccc;
