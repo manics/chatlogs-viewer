@@ -1,23 +1,24 @@
-<div>
+<div class='parameters'>
   <select ng-model='room' ng-options='r for r in rooms'
-    ng-change='messages.initialise(room, dateStart)'></select>
-  <datepicker ng-model='dateStart' disable-timepicker='true'
-    label-format='EEEE, MMMM d, yyyy' date-format='d-MM-yyyy'
-    on-change='messages.initialise(room, dateStart)'></datepicker>
+    ng-change='messages.initialiseOne(room, dateStart, 50)'></select>
+  <datepicker ng-model='dateStart'
+    on-change='messages.initialiseOne(room, dateStart, 50)'></datepicker>
   <span>Autoupdate<input type='checkbox' ng-model='autoupdate'
     ng-change='messages.autoupdate(autoupdate)' ng-true-value="10000"
     ng-false-value="0" /></span>
-  <span class='status' ng-class='{"error": messages.iserror}'>{{messages.status}}</span>
+  <div class='status' ng-class='{"error": messages.iserror}'>{{messages.status}}</div>
 </div>
 
 <div class='messages'>
-  <a ng-click='messages.page(-1)' class='more'>Load previous</a>
-  <div ng-repeat='msg in messages.items' class='message' scroll-after>
-    <a id='msg-{{msg.timestamp}}' class='timestamp'>
+  <a ng-click='messages.pagen(-50)' class='more'>Load previous</a>
+  <div ng-repeat='msg in messages.items' class='message' scroll-after
+    prepended='messages.prepended'>
+    <a id='msg-{{msg.timestamp}}' class='timestamp'
+      ng-href='#timeline1/{{messages.room | urlqescape}}/{{msg.timestamp}}'>
       {{msg.timestamp|date:'yyyy-MM-dd HH:mm:ssZ'}}</a>
     <div class='nick'>{{msg.nick}}</div>
-    <div class='messagetext'>{{msg.message}}</div>
+    <div class='messagetext' ng-bind-html='msg.message | linky:"_blank"'></div>
   </div>
-  <a ng-click='messages.page(1)' class='more'>Load next</a>
+  <a ng-click='messages.pagen(50)' class='more'>Load next</a>
 </div>
 

@@ -30,7 +30,11 @@ function main(argv) {
 
   util.puts('Starting server on port ' + port);
   var server = http.createServer(function(req, res) {
-    util.puts(req.method + ' ' + req.url);
+    var logEntry = req.method + ' ' + req.url;
+    if (req.headers['user-agent']) {
+      logEntry += ' ' + req.headers['user-agent'];
+    }
+    util.puts(logEntry);
     if (routing.process(req, res) === false) {
       res.writeHead(404, {'Content-Type': 'text/plain'});
       res.end('No matching route found');
