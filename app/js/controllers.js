@@ -81,6 +81,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout,
   // Initialise from a room name and a date range and optional search
   ChatMessages.prototype.initialiseRange = function(room, startdt, enddt,
     regexp, regexpopts, noround) {
+    this.items = [];
     this.busy = false;
     this.room = room;
     this.startdt = new Date(startdt);
@@ -104,6 +105,7 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout,
 
   // Initialise from a room name and a single date
   ChatMessages.prototype.initialiseOne = function(room, dt, initn) {
+    this.items = [];
     this.busy = false;
     this.room = room;
     this.startdt = dt;
