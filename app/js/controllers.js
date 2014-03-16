@@ -13,11 +13,9 @@ myApp.controller('Timeline1', ['$scope', '$routeParams', 'ChatMessages',
   $scope.room = $routeParams.room ? $routeParams.room : $scope.rooms[0];
   $scope.messages = new ChatMessages();
   var n = 50;
-  try {
-    $scope.dateStart = dateUtils.dateFromIso($routeParams.dt);
-  }
-  catch (err) {
-    $scope.messages.error(err);
+  $scope.dateStart = dateUtils.dateFromIso($routeParams.dt);
+  if (!$scope.dateStart) {
+    $scope.messages.error('Invalid date');
     $scope.dateStart = new Date();
     n = -50;
   }
@@ -25,18 +23,46 @@ myApp.controller('Timeline1', ['$scope', '$routeParams', 'ChatMessages',
   $scope.autoupdate = 0;
 }]);
 
-myApp.controller('Search1', ['$scope', 'ChatMessages', 'dateUtils', function($scope, ChatMessages, dateUtils) {
+myApp.controller('Search1', ['$scope', '$location', '$log', 'ChatMessages',
+  'dateUtils', function($scope, $location, $log, ChatMessages, dateUtils) {
   $scope.rooms = rooms;
-  $scope.room = $scope.rooms[0];
   $scope.messages = new ChatMessages();
-  $scope.dateStart = new Date();
-  $scope.dateEnd = new Date();
-  $scope.regexp = null;
-  $scope.regexpopts = 'i';
+  var s = $location.search();
+  var good = true;
+
+  $scope.room = s.room;
+  if (!$scope.room) {
+    $scope.room = $scope.rooms[0];
+  }
+  $scope.dateStart = dateUtils.dateFromIso(s.startdt);
+  if (!$scope.dateStart) {
+    if (s.startdt) {
+      $scope.messages.error('Invalid date in query string');
+    }
+    $scope.dateStart = new Date();
+    good = false;
+  };
+  $scope.dateEnd = dateUtils.dateFromIso(s.enddt);
+  if (!$scope.dateEnd) {
+    if (s.enddt) {
+      $scope.messages.error('Invalid date in query string');
+    }
+    $scope.dateEnd = new Date();
+    good = false;
+  };
+  $scope.regexp = s.regexp;
+  if (!$scope.regexp) {
+    good = false;
+  }
+  $scope.regexpopts = s.regexpopts == undefined ? 'i' : s.regexpopts;
   $scope.submit = function() {
-    console.log('submit');
-    console.log($scope.regexp);
+    $location.search('room', $scope.room);
+    $location.search('startdt', $scope.dateStart.toISOString());
+    $location.search('enddt', $scope.dateEnd.toISOString());
+    $location.search('regexp', $scope.regexp);
+    $location.search('regexpopts', $scope.regexpopts);
     if ($scope.regexp) {
+      $log.log('Initialising (submit)');
       $scope.messages.initialiseRange($scope.room,
         dateUtils.getStartOfDay($scope.dateStart),
         dateUtils.getEndOfDay($scope.dateEnd),
@@ -46,6 +72,11 @@ myApp.controller('Search1', ['$scope', 'ChatMessages', 'dateUtils', function($sc
       $scope.messages.error('No search terms provided');
     }
   };
+
+  if (good && $scope.regexp) {
+    $log.log('Initialising (url)');
+    $scope.submit();
+  }
 }]);
 
 

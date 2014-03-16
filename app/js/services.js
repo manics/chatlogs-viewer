@@ -30,11 +30,11 @@ angular.module('myApp.services', []).
       return !isNaN(date.getTime());
     }
 
-    // Create a date object from an ISO8601 string
+    // Create a date object from an ISO8601 string, or undefined if invalid
     function dateFromIso(s) {
       var d = new Date(Date.parse(s));
       if (!isValid(d)) {
-        throw 'Invalid date: ' + s;
+        return undefined;
       }
       return d;
     }
