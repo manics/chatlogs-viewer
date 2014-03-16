@@ -18,7 +18,7 @@
       ng-href='#timeline1/{{messages.room}}/{{msg.timestamp}}'>
       {{msg.timestamp|date:'yyyy-MM-dd HH:mm:ssZ'}}</a>
     <div class='nick'>{{msg.nick}}</div>
-    <div class='messagetext'>{{msg.message}}</div>
+    <div class='messagetext' ng-bind-html='msg.message | linky:"_blank"'></div>
   </div>
 </div>
 </form>
