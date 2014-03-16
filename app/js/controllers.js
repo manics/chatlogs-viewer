@@ -111,19 +111,13 @@ myApp.factory('ChatMessages', function($filter, $http, $log, $timeout,
 
   // Initialise from a room name and a date range and optional search
   ChatMessages.prototype.initialiseRange = function(room, startdt, enddt,
-    regexp, regexpopts, noround) {
+    regexp, regexpopts) {
     this.items = [];
     this.busy = false;
     this.room = room;
     this.startdt = new Date(startdt);
-    if (!noround) {
-      this.startdt = dateUtils.getStartOfDay(this.startdt);
-    }
     if (enddt) {
       this.enddt = new Date(enddt);
-      if (!noround) {
-        this.enddt = dateUtils.getEndOfDay(this.enddt);
-      }
     }
     else {
       this.enddt = dateUtils.incrDate(this.startdt, 1);
