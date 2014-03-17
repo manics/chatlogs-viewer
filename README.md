@@ -1,145 +1,112 @@
-# angular-seed — the seed for AngularJS apps
+# Chatlogs Viewer
 
-This project is an application skeleton for a typical [AngularJS](http://angularjs.org/) web app.
-You can use it to quickly bootstrap your angular webapp projects and dev environment for these
-projects.
-
-The seed contains AngularJS libraries, test libraries and a bunch of scripts all preconfigured for
-instant web development gratification. Just clone the repo (or download the zip/tarball), start up
-our (or yours) webserver and you are ready to develop and test your application.
-
-The seed app doesn't do much, just shows how to wire two controllers and views together. You can
-check it out by opening app/index.html in your browser (might not work file `file://` scheme in
-certain browsers, see note below).
-
-_Note: While angular is client-side-only technology and it's possible to create angular webapps that
-don't require a backend server at all, we recommend hosting the project files using a local
-webserver during development to avoid issues with security restrictions (sandbox) in browsers. The
-sandbox implementation varies between browsers, but quite often prevents things like cookies, xhr,
-etc to function properly when an html page is opened via `file://` scheme instead of `http://`._
+A simple [AngularJS](http://angularjs.org/) app for viewing and searching chatlogs based on [angular-seed](https://github.com/angular/angular-seed).
 
 
-## How to use angular-seed
+## Installation
 
-Clone the angular-seed repository and start hacking...
+Clone the repository.
+The chat logs must be stored in MongoDB.
+Each log must contain the following fields:
 
+    {
+        "nick" : "user or nickname",
+        "message" : "Chat log message.",
+        "timestamp" : ISODate("2014-01-01T00:00:00.000Z")
+    }
 
-### Running the app during development
+Install node.js, and run `npm install` to install the required node.js modules.
 
-You can pick one of these options:
-
-* serve this repository with your webserver
-* install node.js and run `scripts/web-server.js`
-
-Then navigate your browser to `http://localhost:<port>/app/index.html` to see the app running in
-your browser.
-
-
-### Running the app in production
-
-This really depends on how complex is your app and the overall infrastructure of your system, but
-the general rule is that all you need in production are all the files under the `app/` directory.
-Everything else should be omitted.
-
-Angular apps are really just a bunch of static html, css and js files that just need to be hosted
-somewhere, where they can be accessed by browsers.
-
-If your Angular app is talking to the backend server via xhr or other means, you need to figure
-out what is the best way to host the static files to comply with the same origin policy if
-applicable. Usually this is done by hosting the files by the backend server or through
-reverse-proxying the backend server(s) and a webserver(s).
+Configure the MongoDB connection details by editting `dbname` and `mdbServer` in `server/search.js`.
+The list of available chatrooms should be configured by editting `rooms` in `app/js/controllers.js`.
+Each room must correspond to a MongoDB collection.
 
 
-### Running unit tests
+## Running the app
 
-We recommend using [jasmine](http://pivotal.github.com/jasmine/) and
-[Karma](http://karma-runner.github.io) for your unit tests/specs, but you are free
-to use whatever works for you.
-
-Requires [node.js](http://nodejs.org/), Karma (`sudo npm install -g karma`) and a local
-or remote browser.
-
-* start `scripts/test.sh` (on windows: `scripts\test.bat`)
-  * a browser will start and connect to the Karma server (Chrome is default browser, others can be captured by loading the same url as the one in Chrome or by changing the `config/karma.conf.js` file)
-* to run or re-run tests just change any of your source or test javascript files
+Start the server by running `node server/webandapi-server.js [port]` (default port: 8000).
+The application will be available at `http://localhost:<port>/app/index.html`, and the API under `http://localhost:<port>/api/`.
 
 
-### End to end testing
+## API
 
-We recommend using [protractor](https://github.com/angular/protractor) for end-to-end tests. It
-uses native events and has special features for Angular applications.
+In additional to the listed parameters all methods accept the following parameters:
 
-Requires a webserver, node.js + `./scripts/web-server.js` or your backend server that hosts the angular static files.
+- pretty `0|1`: Optional, if `1` return formatted JSON, default `0`
+- callback `function-name`: Optional support for JSONP, if provided wrap the returned JSON object in a function with the given name
 
-* create your end-to-end tests in `test/e2e/scenarios.js`
-* serve your project directory with your http/backend server or node.js + `scripts/web-server.js`
-* to run:
-  * run the tests from console with [Protractor](https://github.com/angular/protractor) via
-    `scripts/e2e-test.sh` (on windows: `scripts\e2e-test.bat`)
+All methods return a JSON object.
+If an error occurs the returned JSON will include an `error` field, for example:
 
-### Continuous Integration
+    {"error":"Invalid room"}
 
-CloudBees have provided a CI/deployment setup:
+### /api/page
 
-<a href="https://grandcentral.cloudbees.com/?CB_clickstart=https://raw.github.com/CloudBees-community/angular-js-clickstart/master/clickstart.json"><img src="https://d3ko533tu1ozfq.cloudfront.net/clickstart/deployInstantly.png"/></a>
+Fetch a consecutive set of messages.
+Parameters:
 
-If you run this, you will get a cloned version of this repo to start working on in a private git repo, 
-along with a CI service (in Jenkins) hosted that will run unit and end to end tests in both Firefox and Chrome.
+- room `string`: The chatroom name
+- dt `ISODate`: An ISO 8601 timestamp in the form `YYYY-MM-DDThh:mm:ss.sssZ`
+- nextn `integer`: The number of following messages to fetch, with timestamp greater or equal to `dt`
+- prevn `integer`: The number of previous messages to fetch, with timestamp less than `dt`
 
-### Receiving updates from upstream
+Return:
 
-When we upgrade angular-seed's repo with newer angular or testing library code, you can just
-fetch the changes and merge them into your project with git.
+- `prevlogs`: If `prevn > 0` a list of preceding chat messages ordered by timestamp
+- `nextlogs`: If `nextn > 0` a list of following chat messages ordered by timestamp
 
+Example:
 
-## Directory Layout
+    http://localhost:<port>/api/page?room=chatroom-name&dt=2014-01-01T13:25:00.000Z&nextn=10&prevn=10&pretty=1
 
-    app/                --> all of the files to be used in production
-      css/              --> css files
-        app.css         --> default stylesheet
-      img/              --> image files
-      index.html        --> app layout file (the main html template file of the app)
-      index-async.html  --> just like index.html, but loads js files asynchronously
-      js/               --> javascript files
-        app.js          --> application
-        controllers.js  --> application controllers
-        directives.js   --> application directives
-        filters.js      --> custom angular filters
-        services.js     --> custom angular services
-      lib/              --> angular and 3rd party javascript libraries
-        angular/
-          angular.js        --> the latest angular js
-          angular.min.js    --> the latest minified angular js
-          angular-*.js      --> angular add-on modules
-          version.txt       --> version number
-      partials/             --> angular view partials (partial html templates)
-        partial1.html
-        partial2.html
+    {
+       "prevlogs": [
+          {
+             "nick": "Alice",
+             "message": "Hello",
+             "timestamp": "2014-01-01T13:23:05.142Z"
+          },
+          ....
+       ],
+       "nextlogs": [
+          {
+             "nick": "Bob",
+             "message": "Goodbye",
+             "timestamp": "2014-01-01T13:27:11.912Z"
+          },
+          ....
+       ]
+    }
 
-    config/karma.conf.js        --> config file for running unit tests with Karma
-    config/protractor-conf.js    --> config file for running e2e tests with Protractor
+### /api/search
 
-    scripts/            --> handy shell/js/ruby scripts
-      e2e-test.sh       --> runs end-to-end tests with Karma (*nix)
-      e2e-test.bat      --> runs end-to-end tests with Karma (windows)
-      test.bat          --> autotests unit tests with Karma (windows)
-      test.sh           --> autotests unit tests with Karma (*nix)
-      web-server.js     --> simple development webserver based on node.js
+Search messages within a datetime range using a regular expression.
+Parameters:
 
-    test/               --> test source files and libraries
-      e2e/              -->
-        scenarios.js    --> end-to-end specs
-      lib/
-        angular/                --> angular testing libraries
-          angular-mocks.js      --> mocks that replace certain angular services in tests
-          angular-scenario.js   --> angular's scenario (end-to-end) test runner library
-          version.txt           --> version file
-      unit/                     --> unit level specs/tests
-        controllersSpec.js      --> specs for controllers
-        directivessSpec.js      --> specs for directives
-        filtersSpec.js          --> specs for filters
-        servicesSpec.js         --> specs for services
+- room `string`: The chatroom name
+- startdt `ISODate`: An ISO 8601 timestamp in the form `YYYY-MM-DDThh:mm:ss.sssZ`
+- enddt `ISODate`: An ISO 8601 timestamp in the form `YYYY-MM-DDThh:mm:ss.sssZ`
+- regexp `re`: A regular expression
+- regexpopts `string`: A set of regular expression flags, default `i` (case insensitive matching)
 
-## Contact
+Return:
 
-For more information on AngularJS please check out http://angularjs.org/
+- `chatlogs`: A list of matching chat messages ordered by timestamp
+- `lastdt`: The timestamp of the most recent log message from the room
+
+Example:
+
+    http://localhost:<port>/api/search?room=chatroom-name&startdt=2014-01-01T00:00:00.000Z&enddt=2014-01-02T00:00:00.000Z&regexp=hello&regexpopts=i&pretty=1
+
+    {
+       "chatlogs": [
+          {
+             "nick": "Alice",
+             "message": "Hello",
+             "timestamp": "2014-01-01T13:23:05.142Z"
+          },
+          ....
+       ],
+       "lastdt": "2014-01-31T11:26:58.071Z"
+    }
+

@@ -11,7 +11,7 @@ function apiExample(req, res) {
     res.end('Api\n' + req.url + '\n');
 }
 
-routing.addRoute('^/app/', 'GET', staticServer.handleRequest);
+routing.addRoute('^/app/|^/app$', 'GET', staticServer.handleRequest);
 routing.addRoute('^/api/', 'GET', searchApi.handleRequest);
 
 
